@@ -14,6 +14,14 @@ href="https://fonts.googleapis.com/css?family=Barriecito|Source+Sans+Pro:200&dis
 
 <link rel="stylesheet"
 href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
+<style>
+    .zone {
+        padding: 2rem;
+        background-color: antiquewhite;
+        border: black dotted;
+    }
+</style>
 
 <!-- <link rel="stylesheet"
 href="css/stylz.css" /> -->
@@ -21,24 +29,144 @@ href="css/stylz.css" /> -->
 <title>Untitled Document | Skeleton CSS</title>
 
 <script lang="javascript">
+
+ var state;
  const ws = new WebSocket('ws://localhost:3030');
+
     ws.onopen = () => { 
-    console.log('Now connected'); 
-    ws.send("HELLO!");
+        console.log('Now connected'); 
     };
 
-    ws.onmessage = (msg) => {
-        console.log(msg);
-    };
+    const clientid =  Math.floor(Math.random() * 100);
+
+    var droppable;
+
+    function getState() {
+        let url = 'http://localhost:3000/balance.json';
+
+        fetch(url)
+        .then(res => res.json())
+        .then((out) => {
+         console.log('Checkout this JSON! ', out);
+            if(out && out.type === "balance" && out.client != clientid)
+            {
+                state = out.state;
+                setup();
+            }
+           
+        })
+        .catch(err => { throw err });
+
+    }
     
+   function setup() {
+       console.log("setup "+ state);
+
+        var template = "";
+
+        state.forEach(item => {
+            var zone = item.zone;
+            if(item.matches.length > 0)
+            {
+                item.matches.forEach(card => {
+                    template += `<div class="boxy">${card}</div><br>`;
+                });
+            }
+            document.querySelectorAll("#" + zone +" .cards")[0].innerHTML = "";
+            document.querySelectorAll("#" + zone +" .cards")[0].innerHTML = template;
+            template = "";
+        });
+
+        droppable && droppable.destroy();
+        droppable = new Draggable.Sortable(document.querySelectorAll('.droppy .zone'), {
+             draggable: '.boxy',
+        });
+        
+        droppable.on('sortable:start', (evt) => {
+            console.log(evt.startContainer);
+      
+        });
+
+
+
+        droppable.on('sortable:stop', (evt) => {
+            console.log("Dropped: " + evt.newContainer.id +"?" + evt.oldContainer.id );//+ droppableOrigin + evt.dropzone.dataset.dropzone );
+            if(!evt.newContainer.contains(evt.oldContainer))
+            {
+                setTimeout(save,1000);
+               // save();
+            } else {
+                evt.cancel();
+            }
+      
+        });
+
+        droppable.on('drag:start', (evt) => {
+            console.log("Grabbed the thing: "+evt);
+
+            //droppableOrigin = evt.originalSource.parentNode.dataset.dropzone;
+        });
+
+    };
+
+    function save() {
+        var obj = {
+            "type": "balance",
+            "client": clientid,
+            state: []
+        };
+
+        for (const parent of document.querySelectorAll(".zone")) {
+            matches = [];
+
+            var children =  parent.querySelectorAll('.boxy');
+            for (var i = 0; i < children.length; i++) {
+                
+                    console.log("hit" + children[i].innerHTML + parent.id);
+                    matches.push(children[i].innerHTML);
+                
+             }
+
+             obj.state.push({ 'zone':parent.id,'matches':matches});
+        }
+
+        console.log("Sending:" + obj);
+        ws.send(JSON.stringify(obj));
+        return obj;
+    }
+
+        ws.onmessage = (msg) => {
+            console.log("Got:"+ msg.data);
+            var template = "";
+            var data = JSON.parse(msg.data);
+
+            if(data.client && data.client !== clientid)
+            {
+                getState();
+                return;
+            }
+        
+        };
+
+    window.onload = (event) => {
+        getState();
+    };
+
 </script>
 </head>
 <body>
     <div class="container">
         <h1> Entrance </h1>
-        <div>
-            
+        <div class="droppy">
+        <div class=".three.columns" >
+            <div class="column drop-item zone" id="brains-box"><h2>BRAINS!</h2><div class="cards"></div></div>
+            <div class="column " id="scale-box">SCALE<div class="cards"></div></div>
+            <div class="column drop-item zone" id="brawn-box"><div class="cards"></div></div>
         </div>
+        <div class=".one.columns">
+            <div class="column items-box drop-item zone" id="items-box"><div class="cards"></div></div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
