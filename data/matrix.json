@@ -1,0 +1,10 @@
+{
+  "type": "matrix",
+  "client": 35,
+  "state": [
+    { "row": "1", "cols": ["green","","",""] },
+    { "row": "2", "cols": ["blue","","","blue"] },
+    { "row": "3", "cols": ["red", "red", "red",""] },
+    { "row": "3", "cols": ["blue", "red", "green"] }
+  ]
+}

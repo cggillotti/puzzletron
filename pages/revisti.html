@@ -31,6 +31,7 @@ href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min
     top:0px;
     left:0px;
     z-index:1000;
+}
 </style>
 
 <!-- <link rel="stylesheet"
@@ -103,7 +104,6 @@ href="css/stylz.css" /> -->
             if(!evt.newContainer.contains(evt.oldContainer))
             {
                 setTimeout(save,1000);
-       
                // save();
             } else {
                 evt.cancel();
@@ -125,16 +125,14 @@ href="css/stylz.css" /> -->
             "client": clientid,
             state: []
         };
-        var win = true;
-        var count =0;
 
         for (const parent of document.querySelectorAll(".zone")) {
             matches = [];
 
             var children =  parent.querySelectorAll('.boxy');
             for (var i = 0; i < children.length; i++) {
-                   count++;
-                   // console.log("hit" + children[i].innerHTML + parent.id);
+                
+                    console.log("hit" + children[i].innerHTML + parent.id);
                     matches.push(children[i].innerHTML);
                 
              }
@@ -142,21 +140,10 @@ href="css/stylz.css" /> -->
              obj.state.push({ 'zone':parent.id,'matches':matches});
         }
 
-        var brains = obj.state.find(e => e.zone == "brains-box");
-        console.log(obj.state);
-        debugger;
-        console.log("brains:" + brains.matches.length +"|"+ count);
-        if(brains && brains.matches.length == count)
-        {
-            alert("Winner!");
-            document.querySelector("#cover").classList.add("overlay");
-        }
         console.log("Sending:" + obj);
         ws.send(JSON.stringify(obj));
         return obj;
     }
-
-
 
         ws.onmessage = (msg) => {
             console.log("Got:"+ msg.data);
@@ -178,7 +165,6 @@ href="css/stylz.css" /> -->
 </script>
 </head>
 <body>
-<div id="cover"></div>
     <div class="container">
         <h1> Entrance </h1>
         <div class="droppy">
