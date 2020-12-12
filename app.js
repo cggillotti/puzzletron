@@ -21,6 +21,9 @@ app.use(express.static('pages'));
 app.use(express.static('css'));
 app.use(express.static('media'));
 app.use(express.static('data'));
+app.use(express.static('app'));
+
+
 
 const server = app.listen(3000);  
 // Set up a headless websocket server that prints any
@@ -28,6 +31,25 @@ const server = app.listen(3000);
 console.log('start ws');
 const socketServer = new WebSocket.Server({port: 3030});
 console.log('conf ws');
+
+app.get("/better", function(req,res) {
+  socketServer.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(`{"type":"gravedigger","client":"admin","method":"better"}`);
+    }
+  });
+  res.sendStatus(200);
+});
+
+app.get("/worse", function(req,res) {
+  socketServer.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(`{"type":"gravedigger","client":"admin","method":"worse"}`);
+    }
+  });
+  res.sendStatus(200);
+});
+
 socketServer.on('connection', (socketClient) => {
   console.log('connected');
   console.log('client Set length: ', socketServer.clients.size);
@@ -36,6 +58,8 @@ socketServer.on('connection', (socketClient) => {
     console.log('closed');
     console.log('Number of clients: ', socketServer.clients.size);
   });
+
+  
 
   socketClient.on('message', (message) => {
 
@@ -79,7 +103,6 @@ socketServer.on('connection', (socketClient) => {
       
       } 
 
-      
 
     } catch (err)
     {
