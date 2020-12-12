@@ -54,6 +54,7 @@ href="css/stylz.css" /> -->
 <script lang="javascript">
 
  var state;
+ var won = false;
  const ws = new WebSocket('ws://localhost:3030');
 
     ws.onopen = () => { 
@@ -116,13 +117,13 @@ function lazy(num) {
 }
     
    function setup() {
-       console.log("setup "+ state);
 
        if(state) {
         state.forEach(item => {
-            console.log("item:"+ item + "--" + item.id);
             if(item.class){
             document.querySelector("#"+ item.id).classList.add(item.class);
+            } else if(document.querySelector("#"+ item.id).classList.contains("active")) {
+                document.querySelector("#"+ item.id).classList.remove("active");
             }
         });
        }
@@ -149,11 +150,17 @@ function lazy(num) {
             toggle(document.querySelector(selector));
           }
 
+
+
+          save();
+
        }));
 
     };
 
     function save() {
+
+        
         var obj = {
             "type": "gravedigger",
             "client": clientid,
@@ -161,13 +168,23 @@ function lazy(num) {
         };
       
         var board = document.querySelectorAll(".matrix");
+        won = true; 
         for (var i=0;i<board.length;i++) {
-
+            if(board[i].classList.contains("active"))
+            {
+                won = false;
+            }
+           
             obj.state.push({id: board[i].id,class: board[i].classList.contains("active") ? "active":""});
 
         }
-  
-        console.log("Sending:" + obj);
+
+        obj.won = won;
+        if(won) {
+            alert("Winner!");
+            document.querySelector("#cover").classList.add("overlay");
+        }
+
         ws.send(JSON.stringify(obj));
     }
 
@@ -204,8 +221,6 @@ function lazy(num) {
             <tr><td><button class="matrix" data-row="5" data-col="1" id="E1"></button></td><td><button class="matrix" data-row="5" data-col="2" id="E2"></button></td><td><button class="matrix" data-row="5" data-col="3" id="E3"></button></td><td><button class="matrix" data-row="5" data-col="4" id="E4"></button></td><td><button class="matrix" data-row="5" data-col="5" id="E5"></button></td><td><button class="matrix" data-row="5" data-col="6" id="E6"></button></td><td><button class="matrix" data-row="5" data-col="7" id="E7"></button></td></tr>
             <tr><td><button class="matrix" data-row="6" data-col="1" id="F1"></button></td><td><button class="matrix" data-row="6" data-col="2" id="F2"></button></td><td><button class="matrix" data-row="6" data-col="3" id="F3"></button></td><td><button class="matrix" data-row="6" data-col="4" id="F4"></button></td><td><button class="matrix" data-row="6" data-col="5" id="F5"></button></td><td><button class="matrix" data-row="6" data-col="6" id="F6"></button></td><td><button class="matrix" data-row="6" data-col="7" id="F7"></button></td></tr>
             <tr><td><button class="matrix" data-row="7" data-col="1" id="G1"></button></td><td><button class="matrix" data-row="7" data-col="2" id="G2"></button></td><td><button class="matrix" data-row="7" data-col="3" id="G3"></button></td><td><button class="matrix" data-row="7" data-col="4" id="G4"></button></td><td><button class="matrix" data-row="7" data-col="5" id="G5"></button></td><td><button class="matrix" data-row="7" data-col="6" id="G6"></button></td><td><button class="matrix" data-row="7" data-col="7" id="G7"></button></td></tr>
-
-
             </table>
         </div>
     </div>
