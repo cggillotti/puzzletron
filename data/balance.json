@@ -1,1 +1,7 @@
-{"type":"balance","client":13,"state":[{"zone":"brains-box","matches":["Regality","Mercy","Confidence","Power","Security","Victory","Fanaticism","Instinct","Destruction","Belief","Soul","Veritude"]},{"zone":"brawn-box","matches":[]},{"zone":"items-box","matches":[]}],"winner":true}
+{
+    "type": "balance",
+    "state": [
+    {"zone": "brains-box", "matches": []},
+    {"zone": "brawn-box", "matches": []},
+    {"zone" : "items-box", "matches": ["Power", "Destruction","Regality","Veritude","Confidence","Mercy","Security", "Fanaticism", "Belief", "Victory","Soul", "Instinct"]}
+]}

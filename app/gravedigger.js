@@ -131,8 +131,8 @@
 
         obj.won = won;
         if(won) {
-            alert("Winner!");
-         //   document.querySelector("#cover").classList.add("overlay");
+          
+            document.querySelector("#cover").classList.add("overlay");
         }
 
        // document.querySelector("#cover").classList.add("overlay");
