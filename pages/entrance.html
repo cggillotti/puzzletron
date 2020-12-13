@@ -15,23 +15,55 @@ href="https://fonts.googleapis.com/css?family=Barriecito|Source+Sans+Pro:200&dis
 <link rel="stylesheet"
 href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
+<link rel="stylesheet" href="puz.css"></link>
 <style>
     .zone {
         padding: 2rem;
         background-color: antiquewhite;
-        border: black dotted;
+        box-shadow: gray 5px;
+        /* border: black dotted; */
     }
 
     .overlay{
-    opacity:0.8;
-    background-color:#ccc;
-    position:fixed;
-    width:100%;
-    height:100%;
-    top:0px;
-    left:0px;
-    z-index:1000;
+        opacity:0.8;
+        background-color:#ccc;
+        position:fixed;
+        width:100%;
+        height:100%;
+        top:0px;
+        left:0px;
+        z-index:1000;
+        display: block;
+
+     
     }
+
+    .overlay h1 {
+        margin-left: 25%;
+        margin-top: 25%;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    .pushed img{x
+        margin-bottom: 30px;
+    }
+
+    .pushed {
+        font-size: 2rem;
+        align-items: center;
+    }
+
+    .boxy {
+        padding: 6px;
+        margin:6px;
+        background-color: grey;
+        display: inline-block;
+
+    }
+
 </style>
 
 <!-- <link rel="stylesheet"
@@ -61,6 +93,13 @@ href="css/stylz.css" /> -->
          console.log('Checkout this JSON! ', out);
             if(out && out.type === "balance" && out.client != clientid)
             {
+                if(out.winner == true)
+                {
+                    console.log("already won");
+                    document.querySelector("#cover").classList.remove("hide");
+                    document.querySelector("#cover").classList.add("overlay");
+                }
+
                 state = out.state;
                 setup();
             }
@@ -74,15 +113,17 @@ href="css/stylz.css" /> -->
        console.log("setup "+ state);
 
         var template = "";
-
+        var win = true;
         state.forEach(item => {
             var zone = item.zone;
+
             if(item.matches.length > 0)
             {
                 item.matches.forEach(card => {
-                    template += `<div class="boxy">${card}</div><br>`;
+                    template += `<div class="boxy">${card}</div>`;
                 });
             }
+            console.log("#" + zone +" .cards");
             document.querySelectorAll("#" + zone +" .cards")[0].innerHTML = "";
             document.querySelectorAll("#" + zone +" .cards")[0].innerHTML = template;
             template = "";
@@ -135,7 +176,6 @@ href="css/stylz.css" /> -->
             var children =  parent.querySelectorAll('.boxy');
             for (var i = 0; i < children.length; i++) {
                    count++;
-                   // console.log("hit" + children[i].innerHTML + parent.id);
                     matches.push(children[i].innerHTML);
                 
              }
@@ -148,8 +188,9 @@ href="css/stylz.css" /> -->
         console.log("brains:" + brains.matches.length +"|"+ count);
         if(brains && brains.matches.length == count)
         {
-            alert("Winner!");
+            document.querySelector("#cover").classList.remove("hide");
             document.querySelector("#cover").classList.add("overlay");
+            obj.winner = true;
         }
         console.log("Sending:" + obj);
         ws.send(JSON.stringify(obj));
@@ -176,17 +217,21 @@ href="css/stylz.css" /> -->
 </script>
 </head>
 <body>
-<div id="cover"></div>
+<div id="cover" class="hide"><h1>All comes from thought</h1></div>
     <div class="container">
-        <h1> Entrance </h1>
+        <div class="tweleve columns"><img src="balance.png" width=100%></div>
         <div class="droppy">
-        <div class=".three.columns" >
-            <div class="column drop-item zone" id="brains-box"><h2>BRAINS!</h2><div class="cards"></div></div>
-            <div class="column " id="scale-box">SCALE<div class="cards"></div></div>
-            <div class="column drop-item zone" id="brawn-box"><div class="cards"></div></div>
-        </div>
-        <div class=".one.columns">
-            <div class="column items-box drop-item zone" id="items-box"><div class="cards"></div></div>
+            <div class="row">
+                    <div class="six columns drop-item zone pushed" id="brains-box"><img src="brain.png" width=100%><div class="cards"></div></div>
+                    
+                    <div class="six columns drop-item zone pushed" id="brawn-box"><img src="war.png" width=100%><div class="cards"></div></div>
+            </div>
+            <div style="height: 100px;"></div>
+            <div class="row">
+                <div class="tweleve columns">
+                    <div class="items-box drop-item zone" id="items-box"><div class="cards"></div></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

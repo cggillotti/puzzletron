@@ -50,6 +50,30 @@ app.get("/worse", function(req,res) {
   res.sendStatus(200);
 });
 
+app.get("/resetgrave", function(req,res) {
+  fs.copyFile("data/matrix-start.json","data/matrix.json", ()=>{
+    socketServer.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(`{"type":"gravedigger","client":"admin","method":"reset"}`);
+      }
+    });
+    res.sendStatus(200);
+  });
+
+});
+
+app.get("/resetbalance", function(req,res) {
+  fs.copyFile("data/balance-backup.json","data/balance.json",() => {
+    socketServer.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(`{"type":"balance","client":"admin","method":"reset"}`);
+      }
+    });
+    res.sendStatus(200);
+  });
+
+});
+
 socketServer.on('connection', (socketClient) => {
   console.log('connected');
   console.log('client Set length: ', socketServer.clients.size);

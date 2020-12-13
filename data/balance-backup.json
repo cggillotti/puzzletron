@@ -1,6 +1,7 @@
-[
+{
+    "type": "balance",
+    "state": [
     {"zone": "brains-box", "matches": []},
-    {"zone": "scale-box", "matches": []},
     {"zone": "brawn-box", "matches": []},
-    {"zone" : "items-box", "matches": ["Power", "Destruction","Regality","Veritude","Confidence","Mercy","Security"]}
-]
+    {"zone" : "items-box", "matches": ["Power", "Destruction","Regality","Veritude","Confidence","Mercy","Security", "Fanaticism", "Belief", "Victory","Soul", "Instinct"]}
+]}

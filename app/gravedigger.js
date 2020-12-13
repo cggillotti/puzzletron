@@ -1,7 +1,6 @@
 (function( grave, $, undefined ) {
     //Private Property
     var ws = "";
-    
 
     grave.setSocket = function (websocket) {
         ws = websocket;

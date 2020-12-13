@@ -1,0 +1,9 @@
+body {
+    background: tan;
+    margin: 200px;
+
+}
+
+th, td {
+    border: none;
+}
