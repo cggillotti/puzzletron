@@ -59,8 +59,9 @@ href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min
     .boxy {
         padding: 6px;
         margin:6px;
-        background-color: grey;
+        background-color: rgb(221, 221, 221);
         display: inline-block;
+        font-family: 'Courier New', Courier, monospace;
 
     }
 
@@ -70,6 +71,26 @@ href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min
         background-size: cover;
         background-position: center;
     }
+
+    button {
+        animation-name: backgroundColorPaletteVar2;
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        animation-timing-function: linear;
+    }
+
+    #five-box,
+    #three-box,
+    #one-box,
+    #items-box {
+        background-color: lightslategray;
+    }
+
+    .container {
+        opacity: 95%;
+    };
+
 
 </style>
 
@@ -92,13 +113,13 @@ href="css/stylz.css" /> -->
     var droppable;
 
     function getState() {
-        let url = 'http://localhost:3000/balance.json';
+        let url = 'http://localhost:3000/cocktail.json';
 
         fetch(url)
         .then(res => res.json())
         .then((out) => {
          console.log('Checkout this JSON! ', out);
-            if(out && out.type === "balance" && out.client != clientid)
+            if(out && out.type === "cocktail" && out.client != clientid)
             {
                 if(out.winner == true)
                 {
@@ -127,7 +148,7 @@ href="css/stylz.css" /> -->
             if(item.matches.length > 0)
             {
                 item.matches.forEach(card => {
-                    template += `<div class="boxy">${card}</div>`;
+                    template += `<div class="boxy" data-item=${card}>${card}</div>`;
                 });
             }
             console.log("#" + zone +" .cards");
@@ -139,6 +160,9 @@ href="css/stylz.css" /> -->
         droppable && droppable.destroy();
         droppable = new Draggable.Sortable(document.querySelectorAll('.droppy .zone'), {
              draggable: '.boxy',
+             mirror: {
+                constrainDimensions: true,
+                },
         });
         
         droppable.on('sortable:start', (evt) => {
@@ -149,14 +173,20 @@ href="css/stylz.css" /> -->
 
         droppable.on('sortable:stop', (evt) => {
             console.log("Dropped: " + evt.newContainer.id +"?" + evt.oldContainer.id );//+ droppableOrigin + evt.dropzone.dataset.dropzone );
-            if(!evt.newContainer.contains(evt.oldContainer))
-            {
-                setTimeout(save,1000);
-       
-               // save();
-            } else {
-                evt.cancel();
-            }
+            
+            
+           if(evt.newContainer.childElementCount > 2)
+           {
+               evt.cancel();
+           }else {
+            
+                if(!evt.newContainer.contains(evt.oldContainer))
+                {
+                    setTimeout(save,1000);
+                } else {
+                    evt.cancel();
+                }
+        }
       
         });
 
@@ -168,37 +198,76 @@ href="css/stylz.css" /> -->
 
     };
 
-    function save() {
+    function eval() {
         var obj = {
-            "type": "balance",
+            "type": "cocktail",
             "client": clientid,
             state: []
         };
         var win = true;
-        var count =0;
+        var count = 0;
 
         for (const parent of document.querySelectorAll(".zone")) {
             matches = [];
-
+            console.log(parent);
             var children =  parent.querySelectorAll('.boxy');
+            var key = state.find(item => item.zone == parent.id).key;
             for (var i = 0; i < children.length; i++) {
-                   count++;
+      
                     matches.push(children[i].innerHTML);
+                    if(key != "" && key == children[i].innerHTML)
+                    {
+                        count++;
+                    }
                 
              }
-
-             obj.state.push({ 'zone':parent.id,'matches':matches});
+             obj.state.push({ 'zone':parent.id,'matches':matches, 'key':key});
         }
 
-        var brains = obj.state.find(e => e.zone == "brains-box");
-        console.log(obj.state);
-        console.log("brains:" + brains.matches.length +"|"+ count);
-        if(brains && brains.matches.length == count)
+        if(count == 6)
+        {
+            document.querySelector("#cover").classList.remove("hide");
+            document.querySelector("#cover").classList.add("overlay");
+            obj.winner = true;
+        }else {
+            document.querySelector("#cover-bad").classList.remove("hide");
+            document.querySelector("#cover-bad").classList.add("overlay");
+        }
+    }
+
+    function save() {
+        var obj = {
+            "type": "cocktail",
+            "client": clientid,
+            state: []
+        };
+        var win = true;
+        var count = 0;
+
+        for (const parent of document.querySelectorAll(".zone")) {
+            matches = [];
+            console.log(parent);
+            var children =  parent.querySelectorAll('.boxy');
+            var key = state.find(item => item.zone == parent.id).key;
+            for (var i = 0; i < children.length; i++) {
+      
+                    matches.push(children[i].innerHTML);
+                    if(key != "" && key == children[i].innerHTML)
+                    {
+                        count++;
+                    }
+                
+             }
+             obj.state.push({ 'zone':parent.id,'matches':matches, 'key':key});
+        }
+
+        if(count == 6)
         {
             document.querySelector("#cover").classList.remove("hide");
             document.querySelector("#cover").classList.add("overlay");
             obj.winner = true;
         }
+
         console.log("Sending:" + obj);
         ws.send(JSON.stringify(obj));
         return obj;
@@ -221,26 +290,29 @@ href="css/stylz.css" /> -->
         getState();
     };
 
+
 </script>
 </head>
 <body>
 <div id="cover" class="hide"><h1>Granted</h1></div>
+<div id="cover-bad" class="hide"><h1>☠</h1></div>
     <div class="container">
-        <div class="tweleve columns"><img src="balance.png" width=100%></div>
-        <div class="droppy">
-            <div class="row">
-                    <div class="six columns drop-item zone pushed" id="brains-box"><div class="cards"></div></div>
-                
-                    <div class="six columns drop-item zone pushed" id="brawn-box"><div class="cards"></div></div>
-            </div>
-            <div class="row">
-                <div class="six columns drop-item zone pushed" id="brains-box"><div class="cards"></div></div>
-            
-                <div class="six columns drop-item zone pushed" id="brawn-box"><div class="cards"></div></div>
-        </div>
+            <div class="droppy">
+                <div class="row">
+                    <div class="six columns drop-item zone pushed" id="one-box">🕐 <div class="cards"></div></div>
+                                </div><div class="row"><div class="six columns drop-item zone pushed" id="two-box">🕑 <div class="cards"></div></div>
+                            </div><div class="row"><div class="six columns drop-item zone pushed" id="three-box">🕒<div class="cards"></div></div>
+                        </div><div class="row"> <div class="six columns drop-item zone pushed" id="four-box">🕓<div class="cards"></div></div>
+                    </div><div class="row"><div class="six columns drop-item zone pushed" id="five-box">🕔<div class="cards"></div></div>
+                </div><div class="row"><div class="six columns drop-item zone pushed" id="six-box">🕕<div class="cards"></div></div>
             <div class="row">
                 <div class="tweleve columns">
                     <div class="items-box drop-item zone" id="items-box"><div class="cards"></div></div>
+                </div>
+            </div>
+            <div class="row">   
+                <div class="tweleve columns">
+                    <button onclick="eval">> > > > > ></button>
                 </div>
             </div>
         </div>

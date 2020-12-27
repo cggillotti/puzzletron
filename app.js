@@ -74,6 +74,18 @@ app.get("/resetbalance", function(req,res) {
 
 });
 
+app.get("/resetcocktail", function(req,res) {
+fs.copyFile("data/cocktail-backup.json","data/cocktail.json",() => {
+  socketServer.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(`{"type":"balance","client":"admin","method":"reset"}`);
+    }
+  });
+  res.sendStatus(200);
+});
+
+});
+
 socketServer.on('connection', (socketClient) => {
   console.log('connected');
   console.log('client Set length: ', socketServer.clients.size);
@@ -109,6 +121,22 @@ socketServer.on('connection', (socketClient) => {
       
       } 
 
+      if(data.type && data.type === "cocktail") {
+        console.log("Hit the gravedigger");
+        console.log(JSON.stringify(data));
+        fs.writeFile("data/cocktail.json", JSON.stringify(data), (err) => {
+            if(err) {
+              console.log(err);
+            } else {
+              socketServer.clients.forEach((client) => {
+                if (client.readyState === WebSocket.OPEN) {
+                  client.send(JSON.stringify(data));
+                }
+              });
+            }
+        });
+      
+      } 
 
       if(data.type && data.type === "gravedigger") {
         console.log("Hit the gravedigger");
