@@ -1,11 +1,12 @@
 const express = require('express');
 const  fs  = require('fs');
+const  fsPromises = fs.promises;
 const path = require('path');
 const WebSocket = require('ws');
 
+var Mutex = require('async-mutex').Mutex;
+var mutex = new Mutex();
 const app = express();
-
-const weighItems = ["Power", "Compassion","Destruction","Victory"];
 
 
 app.use(express.urlencoded({ extended: true }));
@@ -83,6 +84,25 @@ socketServer.on('connection', (socketClient) => {
     console.log('Number of clients: ', socketServer.clients.size);
   });
 
+  async function updateAndSendData(puzzle, file, data) {
+    const release = await mutex.acquire();
+    console.log("Hit the "+ puzzle);
+    console.log(JSON.stringify(data));
+
+    try {
+      await fsPromises.writeFile("data/"+file+".json", JSON.stringify(data))
+      socketServer.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(data));
+        }
+      });
+      release();
+    } catch (e) {
+        release();
+        throw e;
+    }
+
+  }
   
 
   socketClient.on('message', (message) => {
@@ -111,19 +131,20 @@ socketServer.on('connection', (socketClient) => {
 
 
       if(data.type && data.type === "gravedigger") {
-        console.log("Hit the gravedigger");
-        console.log(JSON.stringify(data));
-        fs.writeFile("data/matrix.json", JSON.stringify(data), (err) => {
-            if(err) {
-              console.log(err);
-            } else {
-              socketServer.clients.forEach((client) => {
-                if (client.readyState === WebSocket.OPEN) {
-                  client.send(JSON.stringify(data));
-                }
-              });
-            }
-        });
+        updateAndSendData("gravedigger","matrix",data);
+        // console.log("Hit the gravedigger");
+        // console.log(JSON.stringify(data));
+        // fs.writeFile("data/matrix.json", JSON.stringify(data), (err) => {
+        //     if(err) {
+        //       console.log(err);
+        //     } else {
+        //       socketServer.clients.forEach((client) => {
+        //         if (client.readyState === WebSocket.OPEN) {
+        //           client.send(JSON.stringify(data));
+        //         }
+        //       });
+        //     }
+        // });
       
       } 
 
@@ -133,7 +154,7 @@ socketServer.on('connection', (socketClient) => {
       console.log("Error!" + err.message);
       socketServer.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(weighItems));
+          client.send("Error");
         }
       });
     }

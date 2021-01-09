@@ -152,3 +152,6 @@
     }
 
 }( window.grave = window.grave || {} ));
+
+// https://medium.com/swlh/synchronize-your-javsscript-app-with-async-mutex-f0149513ea4b
+// https://spin.atomicobject.com/2018/09/10/javascript-concurrency/

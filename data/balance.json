@@ -1,7 +1,1 @@
-{
-    "type": "balance",
-    "state": [
-    {"zone": "brains-box", "matches": []},
-    {"zone": "brawn-box", "matches": []},
-    {"zone" : "items-box", "matches": ["Power", "Destruction","Regality","Veritude","Confidence","Mercy","Security", "Fanaticism", "Belief", "Victory","Soul", "Instinct"]}
-]}
+{"type":"balance","client":23,"state":[{"zone":"brains-box","matches":[]},{"zone":"brawn-box","matches":[]},{"zone":"items-box","matches":["Power","Destruction","Confidence","Soul","Instinct","Veritude","Regality","Mercy","Fanaticism","Victory","Security","Belief"]}]}
