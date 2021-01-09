@@ -1,9 +1,130 @@
 body {
     background: tan;
-    margin: 200px;
+    margin-top: 200px;
+    
 
 }
 
 th, td {
     border: none;
 }
+
+.overlay{
+    opacity:0.8;
+    background-color:#ccc;
+    position:fixed;
+    width:100%;
+    height:100%;
+    top:0px;
+    left:0px;
+    z-index:1000;}
+
+
+/* GRave */
+#good .active {
+       
+    animation-name: backgroundColorPalette;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: linear;
+}
+
+#bad .active {
+    
+    animation-name: backgroundColorPaletteVar2;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: linear;
+}
+
+#worse .active {
+    
+    animation-name: backgroundColorPaletteVar3;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: linear;
+}
+
+@keyframes backgroundColorPaletteVar2 {
+0% {
+    background: red
+}
+25% {
+    background: pink
+}
+50% {
+    background: magenta
+}
+75% {
+    background: orange;
+}
+100% {
+    background: plum;
+}
+}
+
+@keyframes backgroundColorPalette {
+0% {
+    background: blue
+}
+25% {
+    background: lightskyblue
+}
+50% {
+    background: cornflowerblue
+}
+75% {
+    background: green;
+}
+100% {
+    background: lime;
+}
+}
+
+@keyframes backgroundColorPaletteVar3 {
+0% {
+    background: red
+}
+25% {
+    background: black
+}
+50% {
+    background: yellow
+}
+75% {
+    background: black;
+}
+100% {
+    background: crimson;
+}
+}
+
+@keyframes broken {
+0% {
+    background: black
+}
+100% {
+    background: gray;
+}
+}
+
+.off {
+    display: none;
+}
+
+.hide { 
+    display: none;
+}
+
+#cover-bad {
+    background-color: maroon;
+    animation-name: backgroundColorPaletteVar3;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: linear;
+    font-size: 20rem;
+};

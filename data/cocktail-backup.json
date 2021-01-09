@@ -1,0 +1,11 @@
+{
+    "type": "cocktail",
+    "state": [
+    {"zone": "one-box", "key":"Dazewonder Extract", "matches": []},
+    {"zone": "two-box",  "key":"Esterlamb", "matches": []},
+    {"zone": "three-box", "key":"Blossomweed Juice", "matches": []},
+    {"zone": "four-box",  "key":"Coffee Liquer", "matches": []},
+    {"zone": "five-box",  "key":"Algerise Tincture", "matches": []},
+    {"zone": "six-box",  "key":"Ferriswhip", "matches": []},
+    {"zone" : "items-box", "matches": ["Algerise Tincture","Blossomweed Juice","Coffee Liquer","Dazewonder Extract","Esterlamb","Ferriswhip"]}
+]}

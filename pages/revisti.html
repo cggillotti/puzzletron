@@ -20,50 +20,78 @@ href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min
     .zone {
         padding: 2rem;
         background-color: antiquewhite;
-        border: black dotted;
+        box-shadow: gray 5px;
+        /* border: black dotted; */
     }
 
     .overlay{
-    opacity:0.8;
-    background-color:#ccc;
-    position:fixed;
-    width:100%;
-    height:100%;
-    top:0px;
-    left:0px;
-    z-index:1000;}
+        opacity:0.8;
+        background-color:#ccc;
+        position:fixed;
+        width:100%;
+        height:100%;
+        top:0px;
+        left:0px;
+        z-index:1000;
+        display: block;
 
-button:disabled:before ,
-button[disabled]:before {
-  position: relative;
-}
-
-button:disabled:before ,
-button[disabled]:before {
-  position: absolute;
-  content: "";
-  left: 0;
-  top: 50%;
-  right: 0;
-  border-top: 1px solid;
-  border-color: inherit;
-
-  -webkit-transform:rotate(-5deg);
-  -moz-transform:rotate(-5deg);
-  -ms-transform:rotate(-5deg);
-  -o-transform:rotate(-5deg);
-  transform:rotate(-5deg);
-}
-
-    .matrix {
-        height: 20px;
-        width: 20px;
-        background: gray;
+     
     }
 
-    .active {
-        background-color: hotpink;
+    .overlay h1 {
+        margin-left: 25%;
+        margin-top: 25%;
     }
+
+    .hide {
+        display: none;
+    }
+
+    .pushed img{x
+        margin-bottom: 30px;
+    }
+
+    .pushed {
+        font-size: 2rem;
+        align-items: center;
+    }
+
+    .boxy {
+        padding: 6px;
+        margin:6px;
+        background-color: rgb(221, 221, 221);
+        display: inline-block;
+        font-family: 'Courier New', Courier, monospace;
+
+    }
+
+    body {
+        background-image: url("bg1.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+    }
+
+    button {
+        animation-name: backgroundColorPaletteVar2;
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        animation-timing-function: linear;
+    }
+
+    #five-box,
+    #three-box,
+    #one-box,
+    #items-box {
+        background-color: lightslategray;
+    }
+
+    .container {
+        opacity: 95%;
+    };
+
+
 </style>
 
 <!-- <link rel="stylesheet"
@@ -85,90 +113,165 @@ href="css/stylz.css" /> -->
     var droppable;
 
     function getState() {
-        let url = 'http://localhost:3000/balance.json';
-        setup();
-        // fetch(url)
-        // .then(res => res.json())
-        // .then((out) => {
-        //  console.log('Checkout this JSON! ', out);
-        //     if(out && out.type === "balance" && out.client != clientid)
-        //     {
-        //         state = out.state;
-        //         setup();
-        //     }
+        let url = 'http://localhost:3000/cocktail.json';
+
+        fetch(url)
+        .then(res => res.json())
+        .then((out) => {
+         console.log('Checkout this JSON! ', out);
+            if(out && out.type === "cocktail" && out.client != clientid)
+            {
+                if(out.winner == true)
+                {
+                    console.log("already won");
+                    document.querySelector("#cover").classList.remove("hide");
+                    document.querySelector("#cover").classList.add("overlay");
+                }
+
+                state = out.state;
+                setup();
+            }
            
-        // })
-       // .catch(err => { throw err });
+        })
+        .catch(err => { throw err });
 
     }
     
    function setup() {
        console.log("setup "+ state);
 
-       document.querySelectorAll('.matrix').forEach(e=> e.addEventListener('click',(ev) => {
-            if(e.classList.contains("active"))
-            {
-                e.classList.remove("active");
-            } else {
-                e.classList.add("active");
-            }
-       }));
-
         var template = "";
-
+        var win = true;
         state.forEach(item => {
             var zone = item.zone;
+
             if(item.matches.length > 0)
             {
                 item.matches.forEach(card => {
-                    template += `<div class="boxy">${card}</div><br>`;
+                    template += `<div class="boxy" data-item=${card}>${card}</div>`;
                 });
             }
+            console.log("#" + zone +" .cards");
             document.querySelectorAll("#" + zone +" .cards")[0].innerHTML = "";
             document.querySelectorAll("#" + zone +" .cards")[0].innerHTML = template;
             template = "";
         });
 
+        droppable && droppable.destroy();
+        droppable = new Draggable.Sortable(document.querySelectorAll('.droppy .zone'), {
+             draggable: '.boxy',
+             mirror: {
+                constrainDimensions: true,
+                },
+        });
+        
+        droppable.on('sortable:start', (evt) => {
+            console.log(evt.startContainer);
+      
+        });
+
+
+        droppable.on('sortable:stop', (evt) => {
+            console.log("Dropped: " + evt.newContainer.id +"?" + evt.oldContainer.id );//+ droppableOrigin + evt.dropzone.dataset.dropzone );
+            
+            
+           if(evt.newContainer.childElementCount > 2)
+           {
+               evt.cancel();
+           }else {
+            
+                if(!evt.newContainer.contains(evt.oldContainer))
+                {
+                    setTimeout(save,1000);
+                } else {
+                    evt.cancel();
+                }
+        }
+      
+        });
+
+        droppable.on('drag:start', (evt) => {
+            console.log("Grabbed the thing: "+evt);
+
+            //droppableOrigin = evt.originalSource.parentNode.dataset.dropzone;
+        });
 
     };
 
-    function save() {
+    function eval() {
         var obj = {
-            "type": "balance",
+            "type": "cocktail",
             "client": clientid,
             state: []
         };
         var win = true;
-        var count =0;
+        var count = 0;
 
         for (const parent of document.querySelectorAll(".zone")) {
             matches = [];
-
+            console.log(parent);
             var children =  parent.querySelectorAll('.boxy');
+            var key = state.find(item => item.zone == parent.id).key;
             for (var i = 0; i < children.length; i++) {
-                   count++;
-                   // console.log("hit" + children[i].innerHTML + parent.id);
+      
                     matches.push(children[i].innerHTML);
+                    if(key != "" && key == children[i].innerHTML)
+                    {
+                        count++;
+                    }
                 
              }
-
-             obj.state.push({ 'zone':parent.id,'matches':matches});
+             obj.state.push({ 'zone':parent.id,'matches':matches, 'key':key});
         }
 
-        var brains = obj.state.find(e => e.zone == "brains-box");
-        console.log(obj.state);
-        debugger;
-        console.log("brains:" + brains.matches.length +"|"+ count);
-        if(brains && brains.matches.length == count)
+        if(count == 6)
         {
-            alert("Winner!");
+            document.querySelector("#cover").classList.remove("hide");
             document.querySelector("#cover").classList.add("overlay");
+            obj.winner = true;
+        }else {
+            document.querySelector("#cover-bad").classList.remove("hide");
+            document.querySelector("#cover-bad").classList.add("overlay");
         }
+    }
+
+    function save() {
+        var obj = {
+            "type": "cocktail",
+            "client": clientid,
+            state: []
+        };
+        var win = true;
+        var count = 0;
+
+        for (const parent of document.querySelectorAll(".zone")) {
+            matches = [];
+            console.log(parent);
+            var children =  parent.querySelectorAll('.boxy');
+            var key = state.find(item => item.zone == parent.id).key;
+            for (var i = 0; i < children.length; i++) {
+      
+                    matches.push(children[i].innerHTML);
+                    if(key != "" && key == children[i].innerHTML)
+                    {
+                        count++;
+                    }
+                
+             }
+             obj.state.push({ 'zone':parent.id,'matches':matches, 'key':key});
+        }
+
+        if(count == 6)
+        {
+            document.querySelector("#cover").classList.remove("hide");
+            document.querySelector("#cover").classList.add("overlay");
+            obj.winner = true;
+        }
+
         console.log("Sending:" + obj);
         ws.send(JSON.stringify(obj));
         return obj;
     }
-
 
         ws.onmessage = (msg) => {
             console.log("Got:"+ msg.data);
@@ -187,17 +290,31 @@ href="css/stylz.css" /> -->
         getState();
     };
 
+
 </script>
 </head>
 <body>
-<div id="cover"></div>
+<div id="cover" class="hide"><h1>Granted</h1></div>
+<div id="cover-bad" class="hide"><h1>☠</h1></div>
     <div class="container">
-        <h1> Entrance </h1>
-        <div class=".one.columns">
-            <table>
-
-
-            </table>
+            <div class="droppy">
+                <div class="row">
+                    <div class="six columns drop-item zone pushed" id="one-box">🕐 <div class="cards"></div></div>
+                                </div><div class="row"><div class="six columns drop-item zone pushed" id="two-box">🕑 <div class="cards"></div></div>
+                            </div><div class="row"><div class="six columns drop-item zone pushed" id="three-box">🕒<div class="cards"></div></div>
+                        </div><div class="row"> <div class="six columns drop-item zone pushed" id="four-box">🕓<div class="cards"></div></div>
+                    </div><div class="row"><div class="six columns drop-item zone pushed" id="five-box">🕔<div class="cards"></div></div>
+                </div><div class="row"><div class="six columns drop-item zone pushed" id="six-box">🕕<div class="cards"></div></div>
+            <div class="row">
+                <div class="tweleve columns">
+                    <div class="items-box drop-item zone" id="items-box"><div class="cards"></div></div>
+                </div>
+            </div>
+            <div class="row">   
+                <div class="tweleve columns">
+                    <button onclick="eval">> > > > > ></button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
