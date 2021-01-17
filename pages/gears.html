@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css"
+integrity="sha256-ECB9bbROLGm8wOoEbHcHRxlHgzGqYpDtNTgDTyDz0wg=" crossorigin="anonymous" />
+
+<link rel="stylesheet"
+href="https://fonts.googleapis.com/css?family=Barriecito|Source+Sans+Pro:200&display=swap" />
+
+<link rel="stylesheet"
+href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
+<link rel="stylesheet" href="puz.css"></link>
+<style>
+    .zone {
+        padding: 2rem;
+        background-color: antiquewhite;
+        box-shadow: gray 5px;
+        /* border: black dotted; */
+    }
+
+    .overlay{
+        opacity:0.8;
+        background-color:#ccc;
+        position:fixed;
+        width:100%;
+        height:100%;
+        top:0px;
+        left:0px;
+        z-index:1000;
+        display: block;
+
+     
+    }
+
+    .overlay h1 {
+        margin-left: 25%;
+        margin-top: 25%;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    .pushed img{x
+        margin-bottom: 30px;
+    }
+
+    .pushed {
+        font-size: 2rem;
+        align-items: center;
+    }
+
+    .boxy {
+        padding: 6px;
+        margin:6px;
+        background-color: rgb(221, 221, 221);
+        display: inline-block;
+        font-family: 'Courier New', Courier, monospace;
+
+    }
+
+    body {
+        background: black;
+        color: greenyellow;
+        font-family: serif;
+        
+    }
+
+    .engine-box {
+        display: flex;
+        flex-wrap: wrap;
+
+    }
+
+    .engine {
+        display: flexbox;
+        margin: 50px;
+        padding: 50px;
+        border: white 1px solid;
+    }
+
+    .x {
+        margin: 10px;
+        margin-top:20px;
+
+        border: red dotted;
+        ;
+    }
+
+
+    .clamp {
+        margin:50px;
+        border: white 1px solid;
+    }
+
+    .container {
+        opacity: 95%;
+    };
+
+
+</style>
+
+<!-- <link rel="stylesheet"
+href="css/stylz.css" /> -->
+
+<title>Gear Control</title>
+
+<script lang="javascript">
+
+ var state;
+ const ws = new WebSocket('ws://localhost:3030');
+
+    ws.onopen = () => { 
+        console.log('Now connected'); 
+    };
+
+    const clientid =  Math.floor(Math.random() * 100);
+
+    var droppable;
+
+    function getState(newState = null) {
+        let url = 'http://localhost:3000/gears.json';
+
+        if(newState == null)
+        {
+        fetch(url)
+        .then(res => res.json())
+        .then((out) => {
+         console.log('Checkout this JSON! ', out);
+            if(out && out.type === "gear" && out.client != clientid)
+            {
+                if(out.winner == true)
+                {
+                    console.log("already won");
+                    document.querySelector("#cover").classList.remove("hide");
+                    document.querySelector("#cover").classList.add("overlay");
+                }
+
+                state = out.state;
+                setup();
+            }
+           
+        })
+        .catch(err => { throw err });
+    }else {
+        state = newState;
+        setup();
+    }
+
+    }
+    
+   function setup() {
+       console.log("setup "+ state);
+
+       
+
+    };
+
+    function eval() {
+     
+    }
+
+    function save() {
+        var obj = {
+            "type": "gear",
+            "client": clientid,
+            state: []
+        };
+        var win = true;
+        var count = 0;
+
+        for (const parent of document.querySelectorAll(".zone")) {
+            matches = [];
+            console.log(parent);
+            var children =  parent.querySelectorAll('.boxy');
+            var key = state.find(item => item.zone == parent.id).key;
+            for (var i = 0; i < children.length; i++) {
+      
+                    matches.push(children[i].innerHTML);
+                    if(key != "" && key == children[i].innerHTML)
+                    {
+                        count++;
+                    }
+                
+             }
+             obj.state.push({ 'zone':parent.id,'matches':matches, 'key':key});
+        }
+
+        //check win
+
+        console.log("Sending:" + obj);
+        ws.send(JSON.stringify(obj));
+        return obj;
+    }
+
+    ws.onmessage = (msg) => {
+        console.log("Got:"+ msg.data);
+        var template = "";
+        var data = JSON.parse(msg.data);
+
+        if(data.client && data.client !== clientid)
+        {
+            getState(msg.data);
+            return;
+        }
+    
+    };
+
+    window.onload = (event) => {
+       // getState();
+
+        //Wire
+        document.querySelectorAll('.engine').forEach(e=> e.addEventListener('click',(ev) => {
+            // var toChange = [e];
+            
+            var engines = document.querySelector(".engine-box");
+            var children = document.querySelector(".engine-box").children;
+
+            console.log(children);
+            engines.removeChild(ev.target);
+            engines.prepend(ev.target);
+            console.log(ev);
+
+            }));
+
+    };
+
+
+</script>
+</head>
+<body>
+<div id="cover" class="hide"><h1>Granted</h1></div>
+<div id="cover-bad" class="hide"><h1>☠</h1></div>
+    <div class="container">
+                <div class="row">
+                    
+            <div class="row">
+                <div class="six columns">
+                    <span>Current angle:</span><span></span>
+                </div>
+                <div class="six columns">
+                    <span>Adjusted value:</span><input class="angle"></input>
+                </div>
+            </div>
+            <div class="row">
+                <div class="tweleve columns">
+                    <div class="engine-box">
+                        <div class="engine" data-id="alpha"><span class="name">Alpha</span><br/><span class="x">X</span></div>
+                        <div class="engine" data-id="beta"><span class="name">Beta</span><br/><span class="x">X</span></div>
+                        <div class="engine" data-id="zeta"><span class="name">Zeta</span><br/><span class="x">X</span></div>
+                        <div class="engine" data-id="omega"><span class="name">Omega</span><br/><span class="x">X</span></div>
+                        <div class="engine" data-id="iomega"><span class="name">Iomega</span><br/><span class="x">X</span></div>
+                        <div class="engine" data-id="lenovo"><span class="name">Lenovo</span><br/><span class="x">X</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="tweleve columns">
+                    <div class="clamp-box">
+                        <div class="clamp on" data-id="A" data-state="on">A</div>
+                        <div class="clamp on" data-id="B" data-state="on">B</div>
+                        <div class="clamp on" data-id="C" data-state="on">C</div>
+                        <div class="clamp on" data-id="D" data-state="on">D</div>
+                        <div class="clamp on" data-id="E" data-state="on">E</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">   
+                <div class="tweleve columns">
+                    <button onclick="eval">> > > > > ></button>
+                </div>
+            </div>
+        </div>
+        </div>
+</div>
+</body>
+</html>

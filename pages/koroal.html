@@ -108,7 +108,7 @@ var state;
                 grave.swap("good", clientid);
             } else {
 
-            grave.getState(clientid);
+            grave.getState(clientid, false);
             }
             return;
         }
@@ -117,7 +117,7 @@ var state;
 
     window.onload = (event) => {
 
-        grave.getState(clientid,ws);
+        grave.getState(clientid, true);
     };
 
 </script>

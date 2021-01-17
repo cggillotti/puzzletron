@@ -101,7 +101,7 @@ href="css/stylz.css" /> -->
  const ws = new WebSocket('ws://localhost:3030');
 
 
-    ws.onopen = () => { 
+ ws.onopen = () => { 
         console.log('Now connected'); 
         grave.setSocket(ws);
     };
@@ -113,16 +113,14 @@ href="css/stylz.css" /> -->
         var template = "";
         var data = JSON.parse(msg.data);
 
-        if(data.type == "gravedigger" && data.client && data.client !== clientid)
+        if(data.client && data.client !== clientid)
         {
             if(data.method && data.method == "better")
             {
                 grave.swap("good", clientid);
-            } else if(data.method && data.method == "worse"){
-                grave.swap("worse", clientid);
             } else {
-                grave.getState(clientid);
-                
+
+            grave.getState(clientid, false);
             }
             return;
         }
@@ -131,7 +129,7 @@ href="css/stylz.css" /> -->
 
     window.onload = (event) => {
 
-        grave.getState(clientid,ws);
+        grave.getState(clientid, true);
     };
 
 </script>

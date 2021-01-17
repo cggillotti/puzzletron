@@ -50,16 +50,7 @@ th, td {
 
 @keyframes backgroundColorPaletteVar2 {
 0% {
-    background: red
-}
-25% {
     background: pink
-}
-50% {
-    background: magenta
-}
-75% {
-    background: orange;
 }
 100% {
     background: plum;
@@ -67,16 +58,8 @@ th, td {
 }
 
 @keyframes backgroundColorPalette {
+
 0% {
-    background: blue
-}
-25% {
-    background: lightskyblue
-}
-50% {
-    background: cornflowerblue
-}
-75% {
     background: green;
 }
 100% {
@@ -87,15 +70,6 @@ th, td {
 @keyframes backgroundColorPaletteVar3 {
 0% {
     background: red
-}
-25% {
-    background: black
-}
-50% {
-    background: yellow
-}
-75% {
-    background: black;
 }
 100% {
     background: crimson;

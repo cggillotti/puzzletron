@@ -160,20 +160,7 @@ socketServer.on('connection', (socketClient) => {
 
       if(data.type && data.type === "gravedigger") {
         updateAndSendData("gravedigger","matrix",data);
-        // console.log("Hit the gravedigger");
-        // console.log(JSON.stringify(data));
-        // fs.writeFile("data/matrix.json", JSON.stringify(data), (err) => {
-        //     if(err) {
-        //       console.log(err);
-        //     } else {
-        //       socketServer.clients.forEach((client) => {
-        //         if (client.readyState === WebSocket.OPEN) {
-        //           client.send(JSON.stringify(data));
-        //         }
-        //       });
-        //     }
-        // });
-      
+    
       } 
 
 

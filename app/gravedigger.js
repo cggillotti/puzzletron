@@ -7,7 +7,7 @@
     }
 
 
-    grave.getState = function(clientid) {
+    grave.getState = function(clientid, isInit = false) {
         let url = 'http://localhost:3000/matrix.json';
         
 
@@ -18,12 +18,11 @@
             if(out && out.type === "gravedigger" && out.client != clientid)
             {
                 state = out.state;
-                grave.setup(clientid);
+                grave.setup(clientid, isInit);
             }
            
         })
         .catch(err => { throw err });
-
     }
 
     grave.toggle =  function (e) {
@@ -60,7 +59,7 @@
         return "";
     }
 
-    grave.setup =  function(clientid) {
+    grave.setup =  function(clientid, isInit) {
         
         if(state) {
          if(state.client == clientid || state.won ) {
@@ -80,32 +79,34 @@
          });
         }
  
-        document.querySelectorAll('.active-board .matrix').forEach(e=> e.addEventListener('click',(ev) => {
-          // var toChange = [e];
-          var selector = "";
-          grave.toggle(e);
-           if(e.dataset.row > 1) {
-            console.log( e.dataset.row );
-             selector = ".active-board #" + (grave.lazy(Number(e.dataset.row - 1))) + e.dataset.col;
-             grave.toggle(document.querySelector(selector));
-           }
-           if(e.dataset.row  < 7) {
-             selector = ".active-board #" + (grave.lazy(Number(e.dataset.row) + 1)) + e.dataset.col;
-             grave.toggle(document.querySelector(selector));
-           }
-           if(e.dataset.col > 1) {
-             selector = ".active-board #" + (grave.lazy(e.dataset.row)) + (Number(e.dataset.col)-1);
-             grave.toggle(document.querySelector(selector));
-           } 
-           if(e.dataset.col < 7) {
-             selector = ".active-board #" + (grave.lazy(e.dataset.row)) + (Number(e.dataset.col)+1);
-            console.log(selector);
-             grave.toggle(document.querySelector(selector));
-           }
- 
-           grave.save(clientid);
- 
-        }));
+            if(isInit){
+            document.querySelectorAll('.active-board .matrix').forEach(e=> e.addEventListener('click',(ev) => {
+            // var toChange = [e];
+            var selector = "";
+            grave.toggle(e);
+            if(e.dataset.row > 1) {
+                console.log( e.dataset.row );
+                selector = ".active-board #" + (grave.lazy(Number(e.dataset.row - 1))) + e.dataset.col;
+                grave.toggle(document.querySelector(selector));
+            }
+            if(e.dataset.row  < 7) {
+                selector = ".active-board #" + (grave.lazy(Number(e.dataset.row) + 1)) + e.dataset.col;
+                grave.toggle(document.querySelector(selector));
+            }
+            if(e.dataset.col > 1) {
+                selector = ".active-board #" + (grave.lazy(e.dataset.row)) + (Number(e.dataset.col)-1);
+                grave.toggle(document.querySelector(selector));
+            } 
+            if(e.dataset.col < 7) {
+                selector = ".active-board #" + (grave.lazy(e.dataset.row)) + (Number(e.dataset.col)+1);
+                console.log(selector);
+                grave.toggle(document.querySelector(selector));
+            }
+    
+            grave.save(clientid);
+    
+            }));
+        }
  
      };
 
@@ -147,7 +148,7 @@
 
         target.classList.remove("off");
         target.classList.add("active-board");
-        grave.setup(clientid);
+        grave.setup(clientid,true);
 
     }
 
