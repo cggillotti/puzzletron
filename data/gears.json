@@ -1,0 +1,29 @@
+{
+    "type": "gears",
+    "solution": "31AtrueBfalseCfalseDtrueEtrueiomega0alpha1zeta2beta3lenovo4",
+    "state": {
+        "angle" : "0",
+        "clamps" : [
+            ​​
+            { "on": true, "name": "A" },
+            { "on": true, "name": "B" },
+            { "on": true, "name": "C" },
+            { "on": true, "name": "D" },     ​​​
+            {"on": true, "name": "E" }
+        ],
+        "engines" : [
+            { "name": "alpha", "power": false, "order": 0 },
+           
+            { "name": "beta", "power": false, "order": 1 },
+           
+            { "name": "zeta", "power": false, "order": 2 },
+           
+            { "name": "omega", "power": false, "order": 3 },
+           
+            { "name": "iomega", "power": false, "order": 4 },
+           
+            { "name": "lenovo", "power": false, "order": 5 }
+        ]
+    },
+    "won": false
+}

@@ -83,6 +83,8 @@ href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min
         margin: 50px;
         padding: 50px;
         border: white 1px solid;
+        width:100px;
+        height: 100px;
     }
 
     .x {
@@ -97,11 +99,32 @@ href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min
     .clamp {
         margin:50px;
         border: white 1px solid;
+        width:100px;
+    }
+
+    .clamp.on::after,
+    .clamp.on::before {
+        content:'~'
     }
 
     .container {
         opacity: 95%;
     };
+
+    
+    .toggle-on  {
+        color: blue
+    }
+
+    .toggle-on.off {
+        display: block;
+        color:red;
+    }
+
+    .angle {
+        font-size:larger;
+        width:80px;
+    }
 
 
 </style>
@@ -114,6 +137,7 @@ href="css/stylz.css" /> -->
 <script lang="javascript">
 
  var state;
+ var solution = {};
  const ws = new WebSocket('ws://localhost:3030');
 
     ws.onopen = () => { 
@@ -143,6 +167,7 @@ href="css/stylz.css" /> -->
                 }
 
                 state = out.state;
+                solution = out.solution;
                 setup();
             }
            
@@ -162,37 +187,61 @@ href="css/stylz.css" /> -->
 
     };
 
-    function eval() {
-     
-    }
-
     function save() {
         var obj = {
             "type": "gear",
             "client": clientid,
-            state: []
+            state: {},
+            solution : solution
         };
-        var win = true;
-        var count = 0;
 
-        for (const parent of document.querySelectorAll(".zone")) {
-            matches = [];
-            console.log(parent);
-            var children =  parent.querySelectorAll('.boxy');
-            var key = state.find(item => item.zone == parent.id).key;
-            for (var i = 0; i < children.length; i++) {
-      
-                    matches.push(children[i].innerHTML);
-                    if(key != "" && key == children[i].innerHTML)
-                    {
-                        count++;
-                    }
+        var solutionCanidate = "";
+
+        var orderindex = 0;
+        obj.state.angle = document.querySelector('.angle').value;
+        obj.state.clamps = [];
+        obj.state.engines = [];
+
+        solutionCanidate = obj.state.angle;
+        
+
+        document.querySelectorAll('.clamp').forEach(e=> {
+                e.classList.contains("on");
                 
-             }
-             obj.state.push({ 'zone':parent.id,'matches':matches, 'key':key});
-        }
+                obj.state.clamps.push({
+                    "on" : e.classList.contains("on"),
+                    "name" : e.dataset.id
+                });
 
-        //check win
+                solutionCanidate += e.dataset.id + e.classList.contains("on");
+            });
+        
+
+            Array.from(document.querySelector('.engine-box').children).forEach( e =>  {
+                
+                obj.state.engines.push({
+                    "name": e.dataset.id,
+                    "power": !e.classList.toggle("off"),
+                    "order": orderindex
+                });
+
+                if(!e.classList.toggle("off")) {
+                    solutionCanidate += e.dataset.id+orderindex;
+                }
+
+                orderindex++;
+               
+            });
+
+        console.log(solutionCanidate);    
+
+        if(solutionCanidate == solution)
+        {
+            obj.win = true;
+            document.querySelector("#cover").classList.remove("hide");
+            document.querySelector("#cover").classList.add("overlay");
+
+        }
 
         console.log("Sending:" + obj);
         ws.send(JSON.stringify(obj));
@@ -216,18 +265,34 @@ href="css/stylz.css" /> -->
        // getState();
 
         //Wire
-        document.querySelectorAll('.engine').forEach(e=> e.addEventListener('click',(ev) => {
+        document.querySelectorAll('.engine .name').forEach(e=> e.addEventListener('click',(ev) => {
             // var toChange = [e];
             
             var engines = document.querySelector(".engine-box");
             var children = document.querySelector(".engine-box").children;
 
             console.log(children);
-            engines.removeChild(ev.target);
-            engines.prepend(ev.target);
+            engines.removeChild(ev.target.parentNode);
+            engines.prepend(ev.target.parentNode);
             console.log(ev);
 
             }));
+
+            document.querySelectorAll('.toggle-on').forEach(e=> e.addEventListener('click',(ev) => {
+     
+                ev.target.classList.toggle("off");
+                ev.target.parentNode.dataset.power = !ev.target.classList.contains("off");
+                console.log(ev);
+
+            }));
+
+            
+
+            document.querySelectorAll('.clamp').forEach(e=> e.addEventListener('click',(ev) => {
+                ev.target.classList.toggle("on")
+                console.log(ev);
+            }));
+            
 
     };
 
@@ -235,28 +300,28 @@ href="css/stylz.css" /> -->
 </script>
 </head>
 <body>
-<div id="cover" class="hide"><h1>Granted</h1></div>
+<div id="cover" class="hide"><h1>Opening Door</h1></div>
 <div id="cover-bad" class="hide"><h1>☠</h1></div>
     <div class="container">
                 <div class="row">
                     
             <div class="row">
                 <div class="six columns">
-                    <span>Current angle:</span><span></span>
+                    <h3>Current angle:325°</h3>
                 </div>
                 <div class="six columns">
-                    <span>Adjusted value:</span><input class="angle"></input>
+                    <h3>Adjusted value:<input class="angle" min="0" max="359" maxlength="3" ></input>°</h3>
                 </div>
             </div>
             <div class="row">
                 <div class="tweleve columns">
                     <div class="engine-box">
-                        <div class="engine" data-id="alpha"><span class="name">Alpha</span><br/><span class="x">X</span></div>
-                        <div class="engine" data-id="beta"><span class="name">Beta</span><br/><span class="x">X</span></div>
-                        <div class="engine" data-id="zeta"><span class="name">Zeta</span><br/><span class="x">X</span></div>
-                        <div class="engine" data-id="omega"><span class="name">Omega</span><br/><span class="x">X</span></div>
-                        <div class="engine" data-id="iomega"><span class="name">Iomega</span><br/><span class="x">X</span></div>
-                        <div class="engine" data-id="lenovo"><span class="name">Lenovo</span><br/><span class="x">X</span></div>
+                        <div class="engine" data-id="alpha" data-power="false"><span class="name">Promote Alpha</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="beta" data-power="false"><span class="name">Promote Beta</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="zeta" data-power="false"><span class="name">Promote Zeta</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="omega" data-power="false"><span class="name">Promote Omega</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="iomega" data-power="false"><span class="name">Promote Iomega</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="lenovo" data-power="false"><span class="name">Promote Lenovo</span><br/><div class="toggle-on">Power Status</div></div>
                     </div>
                 </div>
             </div>
@@ -273,7 +338,7 @@ href="css/stylz.css" /> -->
             </div>
             <div class="row">   
                 <div class="tweleve columns">
-                    <button onclick="eval">> > > > > ></button>
+                    <button onclick="save">> > > > > ></button>
                 </div>
             </div>
         </div>
