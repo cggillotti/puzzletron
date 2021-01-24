@@ -87,6 +87,10 @@ href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min
         height: 100px;
     }
 
+    .engine h3{
+       color:red;
+    }
+
     .x {
         margin: 10px;
         margin-top:20px;
@@ -100,20 +104,33 @@ href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min
         margin:50px;
         border: white 1px solid;
         width:100px;
+        color: red;
     }
 
-    .clamp.on::after,
+    .clamp.on {
+        color: green;
+    }
+
     .clamp.on::before {
-        content:'~'
+        content:'~';
+    }
+
+    .clamp.on::after
+    {
+        content:'~ Engaged'
     }
 
     .container {
         opacity: 95%;
     };
 
-    
-    .toggle-on  {
-        color: blue
+
+
+
+    .toggle-on {
+        display: block;
+        border: yellow 1px dotted;
+        padding:5px;
     }
 
     .toggle-on.off {
@@ -183,6 +200,32 @@ href="css/stylz.css" /> -->
    function setup() {
        console.log("setup "+ state);
 
+       document.querySelector('.angle').value = state.angle;
+       
+       state.clamps.forEach(e=> {
+        var select = document.querySelectorAll('.clamp').filter(f=> f.dataset.id == e.name);
+        if(select) {
+            if( select.classList.contains("on") ) {
+                if(!e.on)
+                {
+                    select.classList.toggle("on");
+                }
+
+            } else {
+                if(e.on)
+                {
+                    select.classList.toggle("on");
+                }
+
+            }
+        }
+       });
+       
+       state.engines.forEach(e=> {
+           const template = `<div class="engine" data-id="{alpha}" data-power="false"><h3>α</h3><span class="name">Push Alpha</span><br/><div class="toggle-on">Power Status</div></div>`
+        
+       });
+       
        
 
     };
@@ -286,8 +329,6 @@ href="css/stylz.css" /> -->
 
             }));
 
-            
-
             document.querySelectorAll('.clamp').forEach(e=> e.addEventListener('click',(ev) => {
                 ev.target.classList.toggle("on")
                 console.log(ev);
@@ -307,7 +348,7 @@ href="css/stylz.css" /> -->
                     
             <div class="row">
                 <div class="six columns">
-                    <h3>Current angle:325°</h3>
+                    <h3>Current angle: 325°</h3>
                 </div>
                 <div class="six columns">
                     <h3>Adjusted value:<input class="angle" min="0" max="359" maxlength="3" ></input>°</h3>
@@ -315,18 +356,20 @@ href="css/stylz.css" /> -->
             </div>
             <div class="row">
                 <div class="tweleve columns">
+                    <h2>Engine</h2>
                     <div class="engine-box">
-                        <div class="engine" data-id="alpha" data-power="false"><span class="name">Promote Alpha</span><br/><div class="toggle-on">Power Status</div></div>
-                        <div class="engine" data-id="beta" data-power="false"><span class="name">Promote Beta</span><br/><div class="toggle-on">Power Status</div></div>
-                        <div class="engine" data-id="zeta" data-power="false"><span class="name">Promote Zeta</span><br/><div class="toggle-on">Power Status</div></div>
-                        <div class="engine" data-id="omega" data-power="false"><span class="name">Promote Omega</span><br/><div class="toggle-on">Power Status</div></div>
-                        <div class="engine" data-id="iomega" data-power="false"><span class="name">Promote Iomega</span><br/><div class="toggle-on">Power Status</div></div>
-                        <div class="engine" data-id="lenovo" data-power="false"><span class="name">Promote Lenovo</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="alpha" data-power="false"><h3>α</h3><span class="name">Push Alpha</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="beta" data-power="false"><h3>β</h3><span class="name">Push Beta</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="zeta" data-power="false"><h3>ζ</h3><span class="name">Push Zeta</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="omega" data-power="false"><h3>Ω</h3><span class="name">Push Omega</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="iomega" data-power="false"><h3><img src="/iomega.png" style="width:3rem"></h3><span class="name">Push Iomega</span><br/><div class="toggle-on">Power Status</div></div>
+                        <div class="engine" data-id="lenovo" data-power="false"><h3>L</h3><span class="name">Push Lenovo</span><br/><div class="toggle-on">Power Status</div></div>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="tweleve columns">
+                    <h2>Clamps</h2>
                     <div class="clamp-box">
                         <div class="clamp on" data-id="A" data-state="on">A</div>
                         <div class="clamp on" data-id="B" data-state="on">B</div>

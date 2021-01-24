@@ -113,7 +113,6 @@
      grave.save = function (clientid) {
         
         var obj = {
-            "type": "gravedigger",
             "client": clientid,
             state: []
         };
